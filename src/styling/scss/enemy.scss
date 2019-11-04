@@ -1,0 +1,15 @@
+.enemy {
+    display: flex;
+    width: 280px;
+    height: 300px;
+    border: 1px solid black;
+    margin: auto;
+
+    &-health {
+        background: $dark-red;
+    }
+
+    &-strength {
+        background: $dark-blue;
+    }
+}
