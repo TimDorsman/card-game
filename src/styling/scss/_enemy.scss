@@ -4,12 +4,19 @@
     height: 300px;
     border: 1px solid black;
     margin: auto;
+    justify-content: center;
+    align-items: center;
 
     &-health {
         background: $dark-red;
+        height: auto;
+        color: $white;
+        padding: 50px;
     }
 
     &-strength {
+        color: $white;
+        padding: 50px;
         background: $dark-blue;
     }
 }

@@ -1,56 +1,150 @@
 import React, { Component } from 'react';
 import Card from './components/card';
 import { Cards } from './cards';
+import Enemy from './components/enemy';
+import Announcer from './components/announcer';
 
 class Home extends Component {
     constructor() {
         super();
         this.state = {
+            iteral: 0,
+            allCards: [],
+            cards: [],
             bossHealth: 100,
             bossStrength: 35,
+            turn: true,
+            messages: {
+                attacked: 'attacked!',
+                healed: 'healed up!',
+                defeated: 'defeated the boss!',
+                missed: 'tried to attack but missed'
+            },
+            message: null,
         }
     }
 
-    attackBoss (health, strength, bossHealth, bossStrength, index) {
+    componentDidMount() {
+        this.setState({
+            allCards: [...Cards]
+        }, () => {
+            this.pickRandomCard();
+        });
+    }
+
+    pickRandomCard = (i) => {
+        const TotalCards = 4;
+        console.log(this.state.allCards)
+        const rndNum = Math.floor((Math.random() * this.state.allCards.length) + 0);
+        const newCard = this.state.allCards[rndNum];
+        const allCardss = this.state.allCards;
+
+        allCardss.splice(rndNum, 1);
+        this.setState(state => ({ cards: [...state.cards, newCard], allCards: allCardss, iteral: state.iteral + 1 }));
+        if(this.state.iteral < TotalCards) {
+            setTimeout((i) => this.pickRandomCard(i), 1000)
+        }
+    }
+
+    attackRandomCard = () => {
+        const { cards, bossHealth, bossStrength, messages } = this.state;
+        const rndNum = Math.floor((Math.random() * cards.length) + 0);
+        const rndHealNum = Math.floor((Math.random() * 100) + 1);
+        const chance = (Math.floor(100 / cards.length))
+        const cardList = cards;
+        const rndCard = cards[rndNum];
+
+        if (rndHealNum < chance && bossHealth < 100) {
+            this.healUp(bossHealth);
+
+            this.changeTurns(messages.healed);
+        }
+        else {
+            // this.useExtraDamage();
+            rndCard.health = rndCard.health - bossStrength;
+            cardList[rndNum].health = rndCard.health;
+            cardList[rndNum].customClass = 'attacked';
+
+            window.setTimeout(() => {
+                cardList[rndNum].customClass = null;
+                if (cardList[rndNum].health <= 0) {
+                    cardList.splice(rndNum, 1);
+                }
+            }, 1500)
+
+
+            this.changeTurns(messages.attacked);
+        }
+
+        this.setState({
+            cards: cardList,
+            bossStrength: 35
+        });
+    }
+
+    useExtraDamage() {
+        this.setState(state => ({
+            bossStrength: state.bossStrength + 15
+        }))
+    }
+
+    healUp(health) {
+        const extraHealth = health > 80 ? 100 - health : 20;
+
+        this.setState(state => ({
+            bossHealth: state.bossHealth + extraHealth
+        }))
+    }
+
+    changeTurns(msg) {
+        window.setTimeout(() => {
+            this.setState(state => ({
+                turn: !state.turn,
+                message: msg
+            }));
+        }, 1500)
+    }
+
+    attackBoss = (health, strength, bossHealth, bossStrength, index) => {
+
         bossHealth = bossHealth - strength;
 
         const cardList = this.state.cards;
         cardList[index].health = health - bossStrength;
 
-        if(cardList[index].health <= 0) {
+        if (cardList[index].health <= 0) {
             cardList.splice(index, 1)
         }
 
         this.setState({
             cards: cardList,
-            bossHealth: bossHealth
+            bossHealth: bossHealth,
         });
-        
+
+        if (bossHealth <= 0) {
+            document.write(this.state.messages.defeated);
+            this.changeTurns(this.state.messages.defeated);
+        }
+        else {
+            this.changeTurns(this.state.messages.attacked);
+        }
+
+        window.setTimeout(() => {
+            this.attackRandomCard();
+        }, 3000)
+
         return health - bossStrength;
     }
 
-    componentDidMount () {
-        this.setState({
-            cards: [...Cards]
-        })
-    }
-
     render() {
+        const { bossStrength, bossHealth, turn, message } = this.state;
         return (
             <>
-                <div className="enemy">
-                    <span className="enemy-health">
-                        {this.state.bossHealth}
-                    </span>
-                    <span className="enemy-strength">{this.state.bossStrength}</span>
-                </div>
-                <div className="card-positioner">
-                    <div className="card-holder">
-                        {this.state.cards ? this.state.cards.map((card, i) => {
-                            return <Card handleClick={this} name={card.name} attackBoss={() => this.attackBoss(card.health, card.strength, this.state.bossHealth, this.state.bossStrength, i)} image={require(`./images/${card.image}`)} health={card.health} description={card.description} position={card.position} strength={card.strength} style={{ left: `calc(-150px * ${i})`, zIndex: i }} key={card.id}/>
-                        }): ''}
-                    </div>
-                </div>
+                <Enemy bossHealth={bossHealth} bossStrength={bossStrength} />
+                <Announcer player={this.state.turn} message={message} />
+                {this.state.cards ? this.state.cards.map((card, i) => {
+                    return <Card handleClick={this} name={card.name} turn={turn} attackBoss={() => this.attackBoss(card.health, card.strength, this.state.bossHealth, this.state.bossStrength, i)} image={require(`./images/${card.image}`)} health={card.health} description={card.description} position={card.position} strength={card.strength} style={{ left: `calc(150px * ${i})`, zIndex: i }} key={card.id} customClass={card.customClass} />
+                }) : ''}
             </>
         );
     }

@@ -6,7 +6,9 @@ class Card extends Component {
 
         this.state = {
             health: 100,
-            animated: false
+            animated: false,
+            hover: true,
+            dead: false
         }
     }
 
@@ -14,17 +16,23 @@ class Card extends Component {
         this.setState({
             health: this.props.attackBoss(),
             animated: true
-        }, () => {
-            console.log(this.state.animated)
         })
     }
 
+    handleAnimation() {
+        this.setState({animated: false, hover: false})
+
+        window.setTimeout(() => {
+            this.setState({hover: true})
+        }, 0)
+    }
+
     render() {
-        const { name, health, image, description, strength, style, position } = this.props;
+        const { name, health, image, description, strength, style, position, turn, customClass } = this.props;
         const multiplier = 100 / 61;
-        
+
         return (
-            <div className={`card${this.state.animated ? ' animated': ''}`} style={style} onClick={this.handleClick} onAnimationEnd={() => this.setState({animated: false})}>
+            <div className={`card${this.state.animated ? ' animated': ''}${(this.state.hover && turn) ? ' hover' : ''} ${customClass ? customClass : ''}`} style={style} onClick={() => turn ? this.handleClick() : null} onAnimationEnd={() => this.handleAnimation()} >
                 <div className="card-header">
                     <p className="card-name">{name}</p>
                     <div className="card-health-container">

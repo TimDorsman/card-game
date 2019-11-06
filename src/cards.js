@@ -6,7 +6,8 @@ export const Cards = [
         health: 100,
         description: "It is very big and scary",
         strength: 20,
-        position: -200
+        position: -200,
+        customClass: null
     },
     {
         id: 1,
@@ -15,7 +16,8 @@ export const Cards = [
         health: 100,
         description: "Halloweeeeeen zombie",
         strength: 20,
-        position: -100
+        position: -100,
+        customClass: null
     },
     {
         id: 2,
@@ -24,7 +26,8 @@ export const Cards = [
         health: 100,
         description: "Cute at day, scary at night",
         strength: 20,
-        position: -100
+        position: -100,
+        customClass: null
     },
     {
         id: 3,
@@ -33,6 +36,7 @@ export const Cards = [
         health: 100,
         description: "Fiddle me timbers",
         strength: 15,
+        customClass: null
     },
     {
         id: 4,
@@ -41,6 +45,7 @@ export const Cards = [
         health: 100,
         description: "I come from the land of justice!",
         strength: 10,
+        customClass: null
     },
     {
         id: 5,
@@ -49,6 +54,7 @@ export const Cards = [
         health: 100,
         description: "Please pick up my bones",
         strength: 20,
+        customClass: null
     },
     {
         id: 6,
@@ -57,7 +63,7 @@ export const Cards = [
         health: 100,
         description: "Spawn kill till you die!",
         strength: 5,
-        position: -150
-    },
-    
+        position: -150,
+        customClass: null
+    }
 ]

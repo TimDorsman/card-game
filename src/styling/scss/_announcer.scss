@@ -1,0 +1,15 @@
+.announcer {
+    text-align: center;
+    margin: 20px auto;
+    color: $white;
+
+    span {
+        color: $light-black;
+    }
+
+    &-subtitle {
+        text-align: center;
+        color: $white;
+        font-size: 20px;
+    }
+}
