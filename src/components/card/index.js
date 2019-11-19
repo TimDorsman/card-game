@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 class Card extends Component {
     constructor(props) {
         super(props)
+        this._isMounted = true;
 
         this.state = {
             health: 100,
@@ -13,10 +14,21 @@ class Card extends Component {
     }
 
     handleClick = () => {
+        this._isMounted &&
         this.setState({
             health: this.props.attackBoss(),
             animated: true
         })
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+        console.log(this._isMounted);
+        // this.removeEventListener('click', this.handleClick)
     }
 
     handleAnimation() {
@@ -32,7 +44,7 @@ class Card extends Component {
         const multiplier = 100 / 61;
 
         return (
-            <div className={`card${this.state.animated ? ' animated': ''}${(this.state.hover && turn) ? ' hover' : ''} ${customClass ? customClass : ''}`} style={style} onClick={() => turn ? this.handleClick() : null} onAnimationEnd={() => this.handleAnimation()} >
+            <div className={`card${this.state.animated ? ' animated': ''}${(this.state.hover && turn) ? ' hover' : ''}${customClass ? ` ${customClass}` : ''}`} style={style} onClick={() => turn ? this.handleClick() : null} onAnimationEnd={() => this.handleAnimation()} >
                 <div className="card-header">
                     <p className="card-name">{name}</p>
                     <div className="card-health-container">

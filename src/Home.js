@@ -33,15 +33,14 @@ class Home extends Component {
     }
 
     pickRandomCard = (i) => {
-        const TotalCards = 4;
-        console.log(this.state.allCards)
+        const TotalCards = 7;
         const rndNum = Math.floor((Math.random() * this.state.allCards.length) + 0);
         const newCard = this.state.allCards[rndNum];
         const allCardss = this.state.allCards;
 
         allCardss.splice(rndNum, 1);
         this.setState(state => ({ cards: [...state.cards, newCard], allCards: allCardss, iteral: state.iteral + 1 }));
-        if(this.state.iteral < TotalCards) {
+        if (this.state.iteral < TotalCards) {
             setTimeout((i) => this.pickRandomCard(i), 1000)
         }
     }
@@ -56,7 +55,6 @@ class Home extends Component {
 
         if (rndHealNum < chance && bossHealth < 100) {
             this.healUp(bossHealth);
-
             this.changeTurns(messages.healed);
         }
         else {
@@ -72,14 +70,28 @@ class Home extends Component {
                 }
             }, 1500)
 
-
             this.changeTurns(messages.attacked);
         }
-
+        console.log()
         this.setState({
             cards: cardList,
             bossStrength: 35
         });
+    }
+
+    healAllCards(index) {
+        const cardList = this.state.cards;
+        cardList.forEach((card, cardIndex) => {
+            const extraHealth = card.health > 80 ? 100 - card.health : 20;
+            console.log(card, cardIndex, index);
+            if (cardIndex !== index)
+                card.health = card.health + extraHealth;
+        })
+
+        cardList.splice(index, 1);
+
+        console.log('cardList', cardList);
+        return cardList;
     }
 
     useExtraDamage() {
@@ -105,29 +117,36 @@ class Home extends Component {
         }, 1500)
     }
 
-    attackBoss = (health, strength, bossHealth, bossStrength, index) => {
+    attackBoss = (health, strength, bossHealth, bossStrength, index, passive) => {
+        let cardList = this.state.cards;
 
-        bossHealth = bossHealth - strength;
+        if (passive === 'healing') {
+            console.log('healing')
+            cardList = this.healAllCards(index);
+        }
+        else {
+            bossHealth = bossHealth - strength;
 
-        const cardList = this.state.cards;
-        cardList[index].health = health - bossStrength;
+            cardList[index].health = health - bossStrength;
 
-        if (cardList[index].health <= 0) {
-            cardList.splice(index, 1)
+            if (cardList[index].health <= 0) {
+                cardList.splice(index, 1)
+            }
         }
 
-        this.setState({
-            cards: cardList,
-            bossHealth: bossHealth,
-        });
-
         if (bossHealth <= 0) {
-            document.write(this.state.messages.defeated);
             this.changeTurns(this.state.messages.defeated);
         }
         else {
             this.changeTurns(this.state.messages.attacked);
         }
+
+        window.setTimeout(() => {
+            this.setState({
+                cards: cardList,
+                bossHealth: bossHealth,
+            });
+        }, 1500)
 
         window.setTimeout(() => {
             this.attackRandomCard();
@@ -143,7 +162,7 @@ class Home extends Component {
                 <Enemy bossHealth={bossHealth} bossStrength={bossStrength} />
                 <Announcer player={this.state.turn} message={message} />
                 {this.state.cards ? this.state.cards.map((card, i) => {
-                    return <Card handleClick={this} name={card.name} turn={turn} attackBoss={() => this.attackBoss(card.health, card.strength, this.state.bossHealth, this.state.bossStrength, i)} image={require(`./images/${card.image}`)} health={card.health} description={card.description} position={card.position} strength={card.strength} style={{ left: `calc(150px * ${i})`, zIndex: i }} key={card.id} customClass={card.customClass} />
+                    return <Card handleClick={this} name={card.name} turn={turn} attackBoss={() => this.attackBoss(card.health, card.strength, this.state.bossHealth, this.state.bossStrength, i, card.passive)} image={require(`./images/${card.image}`)} health={card.health} description={card.description} position={card.position} strength={card.strength} style={{ left: `calc(150px * ${i})`, zIndex: i }} key={card.id} customClass={card.customClass} />
                 }) : ''}
             </>
         );
